@@ -20,10 +20,6 @@
 #pragma comment(lib, "legacy_stdio_definitions")
 #endif
 
-#define MAX_EXTRA_FRAME_COUNT 15
-unsigned int glfw_target_fps = 30;
-int extra_frame_count = MAX_EXTRA_FRAME_COUNT;
-
 ImVec4 clear_color = *ImVec4_ImVec4_Float(0.45, 0.55, 0.6, 1.0);
 
 void glfw_render(GLFWwindow *window, VoidCallback renderLoop);
@@ -161,7 +157,7 @@ void glfw_render(GLFWwindow *window, VoidCallback renderLoop) {
   glfwSwapBuffers(window);
 }
 
-void igGLFWRunLoop(GLFWwindow *window, VoidCallback loop, VoidCallback beforeRender, VoidCallback afterRender,
+void igGLFWRunLoop(GLFWwindow *window, VoidCallback loop, VoidCallback nextFrame, VoidCallback beforeRender, VoidCallback afterRender,
                VoidCallback beforeDestroyContext) {
   glfwMakeContextCurrent(window);
   ImGuiIO *io = igGetIO();
@@ -190,26 +186,15 @@ void igGLFWRunLoop(GLFWwindow *window, VoidCallback loop, VoidCallback beforeRen
   // NULL, io.Fonts->GetGlyphRangesJapanese()); IM_ASSERT(font != NULL);
 
   // Main loop
-  double lasttime = glfwGetTime();
   while (!glfwWindowShouldClose(window)) {
     if (beforeRender != NULL) {
       beforeRender();
     }
 
     glfw_render(window, loop);
-
-    while (glfwGetTime() < lasttime + 1.0 / glfw_target_fps) {
-      // do nothing here
+    if (nextFrame != NULL) {
+      nextFrame();
     }
-    lasttime += 1.0 / glfw_target_fps;
-
-    if (extra_frame_count > 0) {
-      extra_frame_count--;
-    } else {
-      glfwWaitEvents();
-      extra_frame_count = MAX_EXTRA_FRAME_COUNT;
-    }
-
     glfwPollEvents();
 
     if (afterRender != NULL) {

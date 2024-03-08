@@ -13,6 +13,7 @@ package imgui
 // #cgo CPPFLAGS: -DCIMGUI_GO_USE_GLFW
 // #include <stdlib.h>
 // extern void loopCallback();
+// extern void nextFrameCallback();
 // extern void beforeRender();
 // extern void afterRender();
 // extern void afterCreateContext();
@@ -185,6 +186,7 @@ var _ Backend[GLFWWindowFlags] = &GLFWBackend{}
 type GLFWBackend struct {
 	afterCreateContext   voidCallbackFunc
 	loop                 voidCallbackFunc
+	nextFrame            voidCallbackFunc
 	beforeRender         voidCallbackFunc
 	afterRender          voidCallbackFunc
 	beforeDestoryContext voidCallbackFunc
@@ -244,13 +246,18 @@ func (b *GLFWBackend) SetBgColor(color Vec4) {
 	C.igSetBgColor(color.toC())
 }
 
-func (b *GLFWBackend) Run(loop func()) {
+func (b *GLFWBackend) Run(loop func(), nextFrame func()) {
 	b.loop = loop
-	C.igGLFWRunLoop(b.handle(), C.VoidCallback(C.loopCallback), C.VoidCallback(C.beforeRender), C.VoidCallback(C.afterRender), C.VoidCallback(C.beforeDestoryContext))
+	b.nextFrame = nextFrame
+	C.igGLFWRunLoop(b.handle(), C.VoidCallback(C.loopCallback), C.VoidCallback(C.nextFrameCallback), C.VoidCallback(C.beforeRender), C.VoidCallback(C.afterRender), C.VoidCallback(C.beforeDestoryContext))
 }
 
 func (b *GLFWBackend) loopFunc() func() {
 	return b.loop
+}
+
+func (b *GLFWBackend) nextFrameFunc() func() {
+	return b.nextFrame
 }
 
 func (b *GLFWBackend) dropCallback() DropCallback {

@@ -1,6 +1,7 @@
 package imgui
 
 // extern void loopCallback();
+// extern void nextFrameCallback();
 // extern void beforeRender();
 // extern void afterRender();
 // extern void afterCreateContext();
@@ -28,6 +29,15 @@ var textureManager TextureManager
 func loopCallback() {
 	if currentBackend != nil {
 		if f := currentBackend.loopFunc(); f != nil {
+			f()
+		}
+	}
+}
+
+//export nextFrameCallback
+func nextFrameCallback() {
+	if currentBackend != nil {
+		if f := currentBackend.nextFrameFunc(); f != nil {
 			f()
 		}
 	}
@@ -173,6 +183,7 @@ type backendCExpose interface {
 	afterCreateHook() func()
 	beforeRenderHook() func()
 	loopFunc() func()
+	nextFrameFunc() func()
 	afterRenderHook() func()
 	beforeDestroyHook() func()
 	dropCallback() DropCallback
