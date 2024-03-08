@@ -26,7 +26,7 @@ void glfw_render(GLFWwindow *window, VoidCallback renderLoop);
 
 void igSetBgColor(ImVec4 color) { clear_color = color; }
 
-void igSetTargetFPS(unsigned int fps) { glfw_target_fps = fps; }
+void igSetTargetFPS(unsigned int fps) {  }
 
 static void glfw_error_callback(int error, const char *description) {
   fprintf(stderr, "Glfw Error %d: %s\n", error, description);
