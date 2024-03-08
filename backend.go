@@ -131,7 +131,7 @@ type Backend[BackendFlagsT ~int] interface {
 	SetAfterRenderHook(func())
 
 	SetBgColor(color Vec4)
-	Run(func())
+	Run(func(), func())
 	Refresh()
 
 	SetWindowPos(x, y int)
